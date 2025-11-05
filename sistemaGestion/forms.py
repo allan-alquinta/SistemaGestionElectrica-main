@@ -9,6 +9,8 @@ from .models import Cliente, Contrato, Tarifa, Medidor, Lectura, Boleta, Pago, U
 #los widgets permiten personalizar los campos del formulario con atributos HTML como clases CSS o placeholders o tipos de input
 #los labels permiten definir etiquetas personalizadas para los campos del formulario
 # y los def clean_<campo> permiten definir validaciones personalizadas para cada campo
+#subiendo un Commit de validaciones EVA3 - archivo forms.py verificado y funcional
+
 # ==========================================================
 # FORMULARIO CLIENTE
 # ==========================================================
