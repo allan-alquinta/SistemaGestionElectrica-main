@@ -1743,4 +1743,4 @@ def perfil_usuario(request):
         'usuario': usuario
     }
     
-    return render(request, 'usuarios/perfil_usuario.html', datos)
+    return render(request, 'usuarios/perfil_usuario.html', datos) 
