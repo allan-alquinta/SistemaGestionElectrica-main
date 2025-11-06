@@ -180,7 +180,7 @@ def crear_cliente(request):
         if form.is_valid():
             # Guardar el cliente
             cliente = form.save()
-            messages.success(request, f'Cliente "{cliente.nombre}" creado exitosamente con número {cliente.numero_cliente}')
+            messages.success(request, f"Cliente {cliente.nombre} registrado con dirección correctamente.")
             return redirect('sistemaGestion:lista_clientes')
     else:
         # generar un formulario vacío
@@ -216,7 +216,7 @@ def editar_cliente(request, cliente_id):
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             cliente_actualizado = form.save()
-            messages.success(request, f'Cliente "{cliente_actualizado.nombre}" actualizado exitosamente')
+            messages.success(request, f'Cliente "{cliente_actualizado.nombre}" actualizado exitosamente con direccion.')
             return redirect('sistemaGestion:lista_clientes')
     else:
         form = ClienteForm(instance=cliente)
@@ -494,7 +494,7 @@ def crear_medidor(request):
         form = MedidorForm(request.POST)
         if form.is_valid():
             medidor = form.save()
-            messages.success(request, f'Medidor "{medidor.numero_medidor}" creado exitosamente')
+            messages.success(request, f'Medidor "{medidor.numero_medidor}" creado exitosamente con registro registro de consumo promedio y fecha de ultima lectura.')
             return redirect('sistemaGestion:lista_medidores')
     else:
         form = MedidorForm()
@@ -524,7 +524,7 @@ def editar_medidor(request, medidor_id):
         form = MedidorForm(request.POST, instance=medidor)
         if form.is_valid():
             medidor_actualizado = form.save()
-            messages.success(request, f'Medidor "{medidor_actualizado.numero_medidor}" actualizado exitosamente')
+            messages.success(request, f'Medidor "{medidor_actualizado.numero_medidor}" actualizado exitosamente con nueva lectura u observacion registrada.')
             return redirect('sistemaGestion:lista_medidores')
     else:
         form = MedidorForm(instance=medidor)
@@ -668,7 +668,7 @@ def crear_lectura(request):
         form = LecturaForm(request.POST)
         if form.is_valid():
             lectura = form.save()
-            messages.success(request, 'Lectura creada exitosamente')
+            messages.success(request, f'Lectura del {lectura.fecha_lectura} creada exitosamente con tipo "{lectura.tipo_lectura}" y consumo de {lectura.consumo_energetico} kWh.')
             return redirect('sistemaGestion:lista_lecturas')
     else:
         form = LecturaForm()
@@ -698,7 +698,7 @@ def editar_lectura(request, lectura_id):
         form = LecturaForm(request.POST, instance=lectura)
         if form.is_valid():
             lectura_actualizada = form.save()
-            messages.success(request, f'Lectura actualizada exitosamente')
+            messages.success(request, f'Lectura del {lectura_actualizada.fecha_lectura} actualizada exitosamente con nuevos valores de tipo "{lectura_actualizada.tipo_lectura}" o consumo energetico.')
             return redirect('sistemaGestion:lista_lecturas')
     else:
         form = LecturaForm(instance=lectura)
@@ -833,7 +833,7 @@ def crear_boleta(request):
         form = BoletaForm(request.POST)
         if form.is_valid():
             boleta = form.save()
-            messages.success(request, 'Boleta creada exitosamente')
+            messages.success(request, f'Boleta N° {boleta.id} creada exitosamente con monto total registrado y estado "{boleta.estado_pago}".')
             return redirect('sistemaGestion:lista_boletas')
     else:
         form = BoletaForm()
@@ -863,7 +863,7 @@ def editar_boleta(request, boleta_id):
         form = BoletaForm(request.POST, instance=boleta)
         if form.is_valid():
             boleta_actualizada = form.save()
-            messages.success(request, f'Boleta actualizada exitosamente')
+            messages.success(request, f'Boleta N° {boleta_actualizada.id} actualizada exitosamente con nuevos valores de monton o estado "{boleta_actualizada.estado_pago}".')
             return redirect('sistemaGestion:lista_boletas')
     else:
         form = BoletaForm(instance=boleta)
@@ -987,7 +987,7 @@ def crear_tarifa(request):
         form = TarifaForm(request.POST)
         if form.is_valid():
             tarifa = form.save()
-            messages.success(request, 'Tarifa creada exitosamente')
+            messages.success(request, f'Tarifa {tarifa.tipo_tarifa} creada exitosamente con costo base y descripcion registrada.')
             return redirect('sistemaGestion:lista_tarifas')
     else:
         form = TarifaForm()
@@ -1017,7 +1017,7 @@ def editar_tarifa(request, tarifa_id):
         form = TarifaForm(request.POST, instance=tarifa)
         if form.is_valid():
             tarifa_actualizada = form.save()
-            messages.success(request, f'Tarifa actualizada exitosamente')
+            messages.success(request, f'Tarifa {tarifa_actualizada.tipo_tarifa} actualizada exitosamente con nuevos valores de costo base o descripcion.')
             return redirect('sistemaGestion:lista_tarifas')
     else:
         form = TarifaForm(instance=tarifa)
@@ -1295,7 +1295,7 @@ def crear_pago(request):
         form = PagoForm(request.POST)
         if form.is_valid():
             pago = form.save()
-            messages.success(request, 'Pago registrado exitosamente')
+            messages.success(request, f'Pago N° {pago.id} registrado exitosamente por {pago.monto_pagado} con "{pago.metodo_pago}".')
             return redirect('sistemaGestion:lista_pagos')
     else:
         form = PagoForm()
@@ -1325,7 +1325,7 @@ def editar_pago(request, pago_id):
         form = PagoForm(request.POST, instance=pago)
         if form.is_valid():
             pago_actualizado = form.save()
-            messages.success(request, f'Pago actualizado exitosamente')
+            messages.success(request, f'Pago N° {pago_actualizado.id} actualizado exitosamente con nuevo monto {pago_actualizado.monto_pagado} y metodo "{pago_actualizado.metodo_pago}".')
             return redirect('sistemaGestion:lista_pagos')
     else:
         form = PagoForm(instance=pago)
