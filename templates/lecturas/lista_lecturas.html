@@ -49,7 +49,6 @@
                     <th scope="col">Fecha Lectura</th>
                     <th scope="col">Tipo</th>
                     <th scope="col">Lectura Actual</th>
-                    <th scope="col">Consumo (kWh)</th>
                     <th scope="col" class="text-center">Acciones</th>
                 </tr>
             </thead>
@@ -59,7 +58,6 @@
                     <td>{{ lectura.fecha_lectura }}</td>
                     <td>{{ lectura.tipo_lectura }}</td>
                     <td>{{ lectura.lectura_actual }}</td>
-                    <td>{{ lectura.consumo_energetico }}</td>
                     <td class="text-center">
                         <a href="{% url 'sistemaGestion:detalle_lectura' lectura.id %}" class="btn btn-sm btn-outline-secondary me-1" title="Ver detalles">
                             <i class="fas fa-eye me-1"></i> Ver

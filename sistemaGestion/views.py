@@ -1,7 +1,7 @@
 """
 Este módulo contiene todas las vistas del sistema de gestión eléctrica desarrollado en Django.
 El sistema permite gestionar clientes, contratos, medidores, lecturas, boletas, pagos, tarifas,
-usuarios y notificaciones con un sistema de autenticación por roles.
+usuarios y notificaciones con un sistema de autenticación por roles. 
 """
 
 from django.shortcuts import render, redirect
@@ -9,6 +9,13 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from .models import Cliente, Contrato, Tarifa, Medidor, Lectura, Boleta, Pago, Usuario, NotificacionPago, NotificacionLectura
 from .forms import ClienteForm, ContratoForm, MedidorForm, LecturaForm, BoletaForm, PagoForm, TarifaForm, UsuarioForm, NotificacionLecturaForm, NotificacionPagoForm
+
+"""
+Estos son unos imports que son para ver la boleta de la facturacion de la luz
+"""
+from django.shortcuts import get_object_or_404, render
+from .models import Cliente, Lectura, Tarifa
+from datetime import date, timedelta
 
 
 # ============================================================================
@@ -180,7 +187,7 @@ def crear_cliente(request):
         if form.is_valid():
             # Guardar el cliente
             cliente = form.save()
-            messages.success(request, f"Cliente {cliente.nombre} registrado con dirección correctamente.")
+            messages.success(request, f"Cliente {cliente.nombre} ha sido registrado exitosamente.")
             return redirect('sistemaGestion:lista_clientes')
     else:
         # generar un formulario vacío
@@ -494,7 +501,7 @@ def crear_medidor(request):
         form = MedidorForm(request.POST)
         if form.is_valid():
             medidor = form.save()
-            messages.success(request, f'Medidor "{medidor.numero_medidor}" creado exitosamente con registro registro de consumo promedio y fecha de ultima lectura.')
+            messages.success(request, f'Medidor "{medidor.numero_medidor}" creado exitosamente con registro de consumo promedio y fecha de ultima lectura.')
             return redirect('sistemaGestion:lista_medidores')
     else:
         form = MedidorForm()
@@ -524,7 +531,7 @@ def editar_medidor(request, medidor_id):
         form = MedidorForm(request.POST, instance=medidor)
         if form.is_valid():
             medidor_actualizado = form.save()
-            messages.success(request, f'Medidor "{medidor_actualizado.numero_medidor}" actualizado exitosamente con nueva lectura u observacion registrada.')
+            messages.success(request, f'Medidor "{medidor_actualizado.numero_medidor}" actualizado exitosamente.')
             return redirect('sistemaGestion:lista_medidores')
     else:
         form = MedidorForm(instance=medidor)
@@ -668,7 +675,7 @@ def crear_lectura(request):
         form = LecturaForm(request.POST)
         if form.is_valid():
             lectura = form.save()
-            messages.success(request, f'Lectura del {lectura.fecha_lectura} creada exitosamente con tipo "{lectura.tipo_lectura}" y consumo de {lectura.consumo_energetico} kWh.')
+            messages.success(request, f'Lectura creada exitosamente.')
             return redirect('sistemaGestion:lista_lecturas')
     else:
         form = LecturaForm()
@@ -698,7 +705,7 @@ def editar_lectura(request, lectura_id):
         form = LecturaForm(request.POST, instance=lectura)
         if form.is_valid():
             lectura_actualizada = form.save()
-            messages.success(request, f'Lectura del {lectura_actualizada.fecha_lectura} actualizada exitosamente con nuevos valores de tipo "{lectura_actualizada.tipo_lectura}" o consumo energetico.')
+            messages.success(request, f'Lectura actualizada exitosamente.')
             return redirect('sistemaGestion:lista_lecturas')
     else:
         form = LecturaForm(instance=lectura)
@@ -833,7 +840,7 @@ def crear_boleta(request):
         form = BoletaForm(request.POST)
         if form.is_valid():
             boleta = form.save()
-            messages.success(request, f'Boleta N° {boleta.id} creada exitosamente con monto total registrado y estado "{boleta.estado_pago}".')
+            messages.success(request, f'Boleta N° creada exitosamente.')
             return redirect('sistemaGestion:lista_boletas')
     else:
         form = BoletaForm()
@@ -863,7 +870,7 @@ def editar_boleta(request, boleta_id):
         form = BoletaForm(request.POST, instance=boleta)
         if form.is_valid():
             boleta_actualizada = form.save()
-            messages.success(request, f'Boleta N° {boleta_actualizada.id} actualizada exitosamente con nuevos valores de monton o estado "{boleta_actualizada.estado_pago}".')
+            messages.success(request, f'Boleta N° actualizada exitosamente.')
             return redirect('sistemaGestion:lista_boletas')
     else:
         form = BoletaForm(instance=boleta)
@@ -922,6 +929,109 @@ def detalle_boleta(request, boleta_id):
         'boleta': boleta
     }
     return render(request, 'boletas/detalle_boleta.html', datos)
+
+#generar boleta
+def generar_boleta(request, cliente_id):
+    if not usuario_logueado(request):
+        return redirect('sistemaGestion:login')
+    
+    if not tiene_permiso(request, 'boletas'):
+        messages.error(request, 'No tiene permisos para acceder a esta seccion')
+        return redirect('sistemaGestion:dashboard')
+    
+    #Obtener al cliente
+    cliente = Cliente.objects.get(id=cliente_id)
+    
+    #Emparejar segun el orden de creacion
+    idx = cliente.id -1 #indice base 0
+    
+    #Asociaciones
+    medidor = Medidor.objects.all()[idx] if Medidor.objects.count() > idx else None
+    lectura = Lectura.objects.all()[idx] if Lectura.objects.count() > idx else None
+    contrato = Contrato.objects.all()[idx] if Contrato.objects.count() > idx else None
+    pago = Pago.objects.all()[idx] if Pago.objects.count() > idx else None
+    tarifa = Tarifa.objects.all()[idx] if Tarifa.objects.count() > idx else None
+    boleta = Boleta.objects.all()[idx] if Boleta.objects.count() > idx else None
+
+    #se calcula lo sumado
+    total = 0
+
+    #Agrego estos 2 valores sin tocar el models.py para el detalle de la boleta de cuenta
+    administracion_servicio = 1046
+    transporte_electricidad = 1580
+
+    #ajustes simples (sin depender de pagos reales)
+    ajuste_mes_anterior = 42 #ajuste simbolico, puede ser fijo o editable luego
+    ajustes_mes_actual = -31 
+
+    #aqui se suman los 2 valores total general
+    total += administracion_servicio + transporte_electricidad + ajuste_mes_anterior + ajustes_mes_actual
+
+    if tarifa and tarifa.precio:
+        total += tarifa.precio
+    if pago and pago.monto_pagado:
+        total += pago.monto_pagado
+    if boleta and boleta.monto_total:
+        total += boleta.monto_total
+    if lectura and lectura.lectura_actual:
+        total += lectura.lectura_actual
+
+    #datos al enviar al template 
+    datos = {
+        'username': request.session.get('username'),
+        'nombre': request.session.get('nombre'),
+        'cliente': cliente,
+        'medidor': medidor,
+        'lectura': lectura,
+        'contrato': contrato,
+        'pago': pago,
+        'tarifa': tarifa,
+        'boleta': boleta,
+        'administracion_servicio': administracion_servicio,
+        'transporte_electricidad': transporte_electricidad,
+        'ajuste_mes_anterior': ajuste_mes_anterior,
+        'ajuste_mes_actual': ajustes_mes_actual,
+        'total': total
+    }
+    return render(request, 'boletas/generar_boleta.html', datos)
+
+#ver boleta
+def ver_boleta(request, id):
+    cliente = get_object_or_404(Cliente, pk=id)
+    lectura = Lectura.objects.last()
+    tarifa = Tarifa.objects.last()
+
+    #valores base 
+    administracion_servicio = 1046
+    transporte_electricidad = 1580
+    ajuste_mes_anterior = 42
+    ajuste_mes_actual = -31
+
+    #Fechas de emision - vencimiento
+    fecha_emision = date.today()
+    fecha_vencimiento = fecha_emision + timedelta(days=15)
+
+    total = administracion_servicio + transporte_electricidad + ajuste_mes_anterior + ajuste_mes_actual
+
+    if tarifa and tarifa.precio:
+        total += tarifa.precio
+    if lectura and lectura.lectura_actual:
+        total += lectura.lectura_actual
+
+    contexto = {
+        'cliente': cliente,
+        'lectura': lectura,
+        'tarifa': tarifa,
+        'administracion_servicio': administracion_servicio,
+        'transporte_electricidad': transporte_electricidad,
+        'ajuste_mes_anterior': ajuste_mes_anterior,
+        'ajuste_mes_actual': ajuste_mes_actual,
+        'fecha_emision': fecha_emision,
+        'fecha_vencimiento': fecha_vencimiento,
+        'total': total
+    }
+
+    return render(request, 'boletas/ver_boleta.html', contexto)
 
 # ============================================================================
 # VISTAS PARA GESTIÓN DE TARIFAS
@@ -987,7 +1097,7 @@ def crear_tarifa(request):
         form = TarifaForm(request.POST)
         if form.is_valid():
             tarifa = form.save()
-            messages.success(request, f'Tarifa {tarifa.tipo_tarifa} creada exitosamente con costo base y descripcion registrada.')
+            messages.success(request, f'Tarifa creada exitosamente.')
             return redirect('sistemaGestion:lista_tarifas')
     else:
         form = TarifaForm()
@@ -1017,7 +1127,7 @@ def editar_tarifa(request, tarifa_id):
         form = TarifaForm(request.POST, instance=tarifa)
         if form.is_valid():
             tarifa_actualizada = form.save()
-            messages.success(request, f'Tarifa {tarifa_actualizada.tipo_tarifa} actualizada exitosamente con nuevos valores de costo base o descripcion.')
+            messages.success(request, f'Tarifa actualizada exitosamente.')
             return redirect('sistemaGestion:lista_tarifas')
     else:
         form = TarifaForm(instance=tarifa)

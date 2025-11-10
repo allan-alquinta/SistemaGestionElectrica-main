@@ -33,6 +33,10 @@
                         <th>Estado</th>
                         <td>{{ medidor.estado_medidor }}</td>
                     </tr>
+                    <tr>
+                        <th>Consumo Promedio (kWh/mes)</th>
+                        <td>{{ medidor.consumo_promedio|floatformat:0 }}</td> 
+                    </tr>
                     {% if medidor.imagen_fisica %}
                     <tr>
                         <th>Imagen Física del Medidor</th>

@@ -17,12 +17,13 @@ from .models import Cliente, Contrato, Tarifa, Medidor, Lectura, Boleta, Pago, U
 class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
-        fields = ['numero_cliente', 'nombre', 'email', 'telefono'] 
+        fields = ['numero_cliente', 'nombre', 'email', 'telefono', 'direccion'] 
         widgets = {
             'numero_cliente': forms.TextInput(attrs={'placeholder': 'Ejemplo: CLI-001','class': 'form-control'}),
             'nombre': forms.TextInput(attrs={'placeholder': 'Ingresa el nombre completo del cliente','class': 'form-control'}),
             'email': forms.EmailInput(attrs={'placeholder': 'ejemplo@correo.com','class': 'form-control'}),
-            'telefono': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678','class': 'form-control'})
+            'telefono': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678','class': 'form-control'}),
+            'direccion': forms.TextInput(attrs={'placeholder': 'Ingrese su dirección','class': 'form-control'})
         }
         labels = {
             'numero_cliente': 'Número de Cliente',
@@ -196,12 +197,14 @@ class TarifaForm(forms.ModelForm):
 class MedidorForm(forms.ModelForm):
     class Meta:
         model = Medidor
-        fields = ['numero_medidor', 'fecha_instalacion', 'ubicacion', 'estado_medidor', 'imagen_ubicacion', 'imagen_fisica']
+        fields = ['numero_medidor', 'fecha_instalacion', 'ubicacion', 'estado_medidor', 'consumo_promedio', 'ultima_lectura', 'imagen_ubicacion', 'imagen_fisica']
         widgets = {
             'numero_medidor': forms.TextInput(attrs={'placeholder': 'Ejemplo: MED-001','class': 'form-control'}),
             'fecha_instalacion': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'ubicacion': forms.TextInput(attrs={'placeholder': 'Dirección o ubicación del medidor','class': 'form-control'}),
             'estado_medidor': forms.Select(attrs={'class': 'form-control'}),
+            'consumo_promedio': forms.NumberInput(attrs={'placeholder': 'Consumo promedio (kWh/mes)', 'class': 'form-control', 'min': '0', 'max': '1000', 'step': '1', 'inputmode': 'numeric', 'title': 'Ingrese el consumo promedio mensual estimado en kWh'}),
+            'ultima_lectura': forms.TextInput(attrs={'placeholder': 'ingrese la última lectura del medidor (solo numeros)', 'class': 'form-control'}),
             'imagen_ubicacion': forms.URLInput(attrs={'placeholder': 'https://ejemplo.com/mapa-ubicacion.jpg','class': 'form-control'}),
             'imagen_fisica': forms.URLInput(attrs={'placeholder': 'https://ejemplo.com/foto-medidor.jpg','class': 'form-control'})
         }
@@ -210,6 +213,8 @@ class MedidorForm(forms.ModelForm):
             'fecha_instalacion': 'Fecha de Instalación',
             'ubicacion': 'Ubicación',
             'estado_medidor': 'Estado del Medidor',
+            'consumo_promedio': 'Consumo Promedio (kWh/mes)',
+            'ultima_lectura': 'Última Lectura',
             'imagen_ubicacion': 'URL Imagen Mapa/Ubicación (opcional)',
             'imagen_fisica': 'URL Imagen Física del Medidor (opcional)'
         }
@@ -256,7 +261,7 @@ class MedidorForm(forms.ModelForm):
 class LecturaForm(forms.ModelForm):
     class Meta:
         model = Lectura
-        fields = ['fecha_lectura', 'consumo_energetico', 'tipo_lectura', 'lectura_actual']
+        fields = ['fecha_lectura', 'tipo_lectura', 'lectura_actual']
         widgets = {
             'fecha_lectura': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'consumo_energetico': forms.NumberInput(attrs={'placeholder': 'Consumo en kWh','class': 'form-control','min': '0'}),
@@ -265,7 +270,6 @@ class LecturaForm(forms.ModelForm):
         }
         labels = {
             'fecha_lectura': 'Fecha de Lectura',
-            'consumo_energetico': 'Consumo Energético (kWh)',
             'tipo_lectura': 'Tipo de Lectura',
             'lectura_actual': 'Lectura Actual'
         }

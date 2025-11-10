@@ -49,8 +49,6 @@ class Tarifa(models.Model):
     precio = models.PositiveIntegerField()
     tipo_tarifa = models.CharField(max_length=45, choices=TARIFA_CHOICES, default='Verano')
     tipo_cliente = models.CharField(max_length=45, choices=CLIENTE_CHOICES, default='Residencial')
-    costo_base = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    descripcion = models.CharField(max_length=200, blank=True, null=True)
 
 
     def __str__(self):
@@ -71,8 +69,7 @@ class Medidor(models.Model):
     imagen_ubicacion = models.URLField(max_length=200, blank=True, null=True)  # Imagen del mapa de ubicación
     imagen_fisica = models.URLField(max_length=200, blank=True, null=True)     # Imagen física del medidor
     consumo_promedio = models.DecimalField(max_digits=8, decimal_places=2, default=0)
-    ultima_lectura = models.DateField(blank=True, null=True)
-    observacion = models.CharField(max_length=200, black=True, null=True)
+    ultima_lectura = models.PositiveIntegerField(default=0, blank=True, null=True)
 
     def __str__(self):
         return f"Medidor {self.numero_medidor} - {self.ubicacion} ({self.estado_medidor})"
@@ -84,11 +81,9 @@ class Lectura(models.Model):
     ]
     
     fecha_lectura = models.DateField()
-    consumo_energetico = models.PositiveIntegerField()
+    consumo_energetico = models.PositiveIntegerField(default=0)
     tipo_lectura = models.CharField(max_length=45, choices=TIPO_LECTURA_CHOICES, default='Digital')
     lectura_actual = models.PositiveIntegerField()
-    lectura_anterior = models.PositiveIntegerField(default=0)
-    observacion_lectura= models.CharField(max_length=150, blank=True, null=True)
 
     def __str__(self):
         return f"Lectura {self.fecha_lectura} - {self.consumo_energetico} kWh"
@@ -136,7 +131,6 @@ class Pago(models.Model):
 
 class NotificacionLectura(models.Model):
     registro_consumo = models.CharField(max_length=500)
-    mensaje = models.CharField(max_length=200, black=True, null=True)
 
     def __str__(self):
         return f"Notificación Lectura - {self.registro_consumo[:30]}..."
@@ -144,7 +138,6 @@ class NotificacionLectura(models.Model):
 
 class NotificacionPago(models.Model):
     deuda_pendiente = models.CharField(max_length=500)
-    mensaje = models.CharField(max_length=200, black=True, null=True)
 
     def __str__(self):
         return f"Notificación Pago - {self.deuda_pendiente[:30]}..."
@@ -166,4 +159,4 @@ class Usuario(models.Model):
 
     def __str__(self):
         return f"{self.username} - {self.rol}"
-
+    

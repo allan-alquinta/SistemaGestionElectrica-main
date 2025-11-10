@@ -66,7 +66,7 @@
                 <tr>
                     <td>{{ tarifa.tipo_tarifa }}</td>
                     <td>{{ tarifa.tipo_cliente }}</td>
-                    <td>${{ tarifa.precio|floatformat:2 }}</td>
+                    <td>${{ tarifa.precio|floatformat:0 }}</td>
                     <td>{{ tarifa.fecha_vigencia }}</td>
                     <td class="text-center">
                         <a href="{% url 'sistemaGestion:detalle_tarifa' tarifa.id %}" class="btn btn-sm btn-outline-secondary me-1" title="Ver detalles">

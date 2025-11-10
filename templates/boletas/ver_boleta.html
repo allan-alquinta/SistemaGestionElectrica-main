@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Detalle consumo eléctrico</h2>
+
+    <!-- 🔹 Encabezado del Cliente -->
+    <div class="card p-4 shadow-sm mb-4">
+        <h5><strong>Datos del Cliente</strong></h5>
+        <table class="table table-borderless">
+            <tbody>
+                <tr>
+                    <td><strong>N° Cliente:</strong></td>
+                    <td class="text-end">{{ cliente.numero_cliente }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Nombre:</strong></td>
+                    <td class="text-end">{{ cliente.nombre }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Correo electrónico:</strong></td>
+                    <td class="text-end">{{ cliente.email }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Teléfono:</strong></td>
+                    <td class="text-end">{{ cliente.telefono }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Dirección:</strong></td>
+                    <td class="text-end">{{ cliente.direccion }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Fecha de emisión:</strong></td>
+                    <td class="text-end">{{ fecha_emision|date:"d/m/Y" }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Fecha de vencimiento:</strong></td>
+                    <td class="text-end">{{ fecha_vencimiento|date:"d/m/Y" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 🔸 Servicio Eléctrico -->
+    <div class="card p-4 shadow-sm">
+        <h5><strong>Servicio Eléctrico</strong></h5>
+        <table class="table table-borderless">
+            <tbody>
+                <tr>
+                    <td>Administración del servicio:</td>
+                    <td class="text-end">{{ administracion_servicio }}</td>
+                </tr>
+                <tr>
+                    <td>Transporte de electricidad:</td>
+                    <td class="text-end">{{ transporte_electricidad }}</td>
+                </tr>
+                <tr>
+                    <td>Electricidad consumida: ({{ lectura.lectura_actual }} kWh)</td>
+                    <td class="text-end">${{ lectura.lectura_actual|floatformat:0 }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h5><strong>Otros Cargos</strong></h5>
+        <table class="table table-borderless">
+            <tbody>
+                <tr>
+                    <td>Ajuste para pago efectivo (mes anterior):</td>
+                    <td class="text-end">${{ ajuste_mes_anterior }}</td>
+                </tr>
+                <tr>
+                    <td>Ajuste para pago efectivo (mes actual):</td>
+                    <td class="text-end">${{ ajuste_mes_actual }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <table class="table table-borderless">
+            <tbody>
+                <tr><td>Total exento:</td><td class="text-end">$ {{ tarifa.precio|default:0 }}</td></tr>
+                <tr><td>Total neto:</td><td class="text-end">$ {{ total }}</td></tr>
+                <tr><td>19% IVA:</td><td class="text-end">${{ total|floatformat:0 }}</td></tr>
+                <tr><td>Total boleta:</td><td class="text-end">${{ total }}</td></tr>
+                <tr><td>Otros:</td><td class="text-end">$0</td></tr>
+                <tr><td>Saldo anterior:</td><td class="text-end">$0</td></tr>
+            </tbody>
+        </table>
+
+        <h4 class="text-end mt-3"><strong>Total a pagar: ${{ total }}</strong></h4>
+
+        <p class="mt-3 text-muted" style="font-size: 0.9em;">
+            Valores con IVA incluido. Tarifas fijadas según decreto N°111T/2016.
+        </p>
+    </div>
+
+    <div class="card mt-4 p-3 shadow-sm">
+        <h5>¿Qué significa lo que estoy pagando?</h5>
+        <p><strong>Transporte de la electricidad:</strong> Monto que se paga por el uso de torres y subestaciones que llevan la electricidad desde donde se produce hasta las afueras de la ciudad.</p>
+        <p><strong>Ajuste por pago en efectivo (mes anterior):</strong> Monto cobrado o descontado del mes anterior para evitar pagos con monedas inferiores a $5.</p>
+    </div>
+    
+    <button id="btnDescargarBoleta" class="btn btn-primary">
+    Descargar boleta como JPG
+</button>
+        <a href="#" class="btn btn-secondary ms-2">Enviar por Correo</a>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+document.getElementById("btnDescargarBoleta").addEventListener("click", function() {
+    const boleta = document.querySelector(".container.mt-4");
+    html2canvas(boleta).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "boleta.jpg";
+        link.href = canvas.toDataURL("image/jpeg");
+        link.click();
+    });
+});
+</script>
+{% endblock %}

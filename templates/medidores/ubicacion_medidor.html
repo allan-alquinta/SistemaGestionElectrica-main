@@ -19,6 +19,7 @@
                 <tr><th>Estado:</th><td><span class="badge estado-{{ medidor.estado_medidor|lower }}">{{ medidor.estado_medidor }}</span></td></tr>
                 <tr><th>Fecha de Instalación:</th><td>{{ medidor.fecha_instalacion|date:"d/m/Y" }}</td></tr>
                 <tr><th>Ubicación:</th><td>{{ medidor.ubicacion }}</td></tr>
+                <tr><th>Consumo Promedio (kWh/mes):</th><td>{{ medidor.consumo_promedio|floatformat:0 }}</td></tr>
             </table>
         </div>
         <div class="panel-imagen-fisica">
