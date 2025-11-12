@@ -46,7 +46,8 @@ urlpatterns = [
     path('boletas/eliminar/<int:boleta_id>/', views.eliminar_boleta, name='eliminar_boleta'), # Eliminar boleta
     path('boletas/editar/<int:boleta_id>/', views.editar_boleta, name='editar_boleta'), # Editar boleta
     path('boletas/generar/<int:cliente_id>/', views.generar_boleta, name='generar_boleta'),  # Generar boleta detallada
-    path('boleta/<int:id>/', views.ver_boleta, name='ver_boleta'), # Ver boleta 
+    path('boleta/<int:id>/', views.ver_boleta, name='ver_boleta'), # Ver boleta
+    path('boletas/generar/', views.generar_boleta, name='generar_boleta'), # genera la boleta seleccionando un cliente y va a ver boleta
     
     # Pagos
     path('pagos/', views.lista_pagos, name='lista_pagos'), # Página de lista de pagos

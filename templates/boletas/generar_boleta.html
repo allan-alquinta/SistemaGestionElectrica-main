@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h4 class="mb-4">Generar Boleta Automáticamente</h4>
+
+  <form method="POST" action="">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="cliente" class="form-label"><strong>Seleccione un Cliente:</strong></label>
+      <select name="cliente" id="cliente" class="form-select" required>
+        <option value="">-- Seleccione un cliente --</option>
+        {% for c in clientes %}
+          <option value="{{ c.id }}">{{ c.nombre }} — {{ c.email }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">
+      Ver boleta
+    </button>
+  </form>
+
+  {% if mensaje %}
+    <div class="alert alert-success mt-3">{{ mensaje }}</div>
+  {% endif %}
+</div>
+{% endblock %}

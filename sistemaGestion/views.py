@@ -14,7 +14,8 @@ from .forms import ClienteForm, ContratoForm, MedidorForm, LecturaForm, BoletaFo
 Estos son unos imports que son para ver la boleta de la facturacion de la luz
 """
 from django.shortcuts import get_object_or_404, render
-from .models import Cliente, Lectura, Tarifa
+from .models import Cliente, Lectura, Tarifa, Boleta
+from django.contrib import messages
 from datetime import date, timedelta
 
 
@@ -995,7 +996,7 @@ def generar_boleta(request, cliente_id):
     }
     return render(request, 'boletas/generar_boleta.html', datos)
 
-#ver boleta
+#ver boleta para descargarla en JPG
 def ver_boleta(request, id):
     cliente = get_object_or_404(Cliente, pk=id)
     lectura = Lectura.objects.last()
@@ -1032,6 +1033,56 @@ def ver_boleta(request, id):
     }
 
     return render(request, 'boletas/ver_boleta.html', contexto)
+
+#Ver datos para seleccionar un cliente cualquiera y luego lo manda a la pagina ver boleta de facturacion
+def generar_boleta(request):
+    clientes = Cliente.objects.all()
+    mensaje = None
+    nueva_boleta = None
+
+    if request.method == 'POST':
+        cliente_id = request.POST.get('cliente')
+        if cliente_id:
+            cliente = Cliente.objects.get(id=cliente_id)
+            lectura = Lectura.objects.last()
+            tarifa = Tarifa.objects.last()
+
+            # Valores base de cobro
+            administracion_servicio = 1046
+            transporte_electricidad = 1580
+            ajuste_mes_anterior = 42
+            ajuste_mes_actual = -31
+
+            # Fechas de emisión y vencimiento
+            fecha_emision = date.today()
+            fecha_vencimiento = fecha_emision + timedelta(days=15)
+
+            # Cálculo total de la boleta
+            total = administracion_servicio + transporte_electricidad + ajuste_mes_anterior + ajuste_mes_actual
+            if tarifa and tarifa.precio:
+                total += tarifa.precio
+            if lectura and lectura.lectura_actual:
+                total += lectura.lectura_actual
+
+            # Crear y guardar nueva boleta
+            nueva_boleta = Boleta.objects.create(
+                cliente=cliente,
+                lectura=lectura,
+                tarifa=tarifa,
+                fecha_emision=fecha_emision,
+                fecha_vencimiento=fecha_vencimiento,
+                total=total
+            )
+
+            mensaje = f"Boleta generada exitosamente para {cliente.nombre}"
+
+    datos = {
+        'clientes': clientes,
+        'mensaje': mensaje,
+        'boleta': nueva_boleta
+    }
+
+    return render(request, 'boletas/generar_boleta.html', datos)
 
 # ============================================================================
 # VISTAS PARA GESTIÓN DE TARIFAS
