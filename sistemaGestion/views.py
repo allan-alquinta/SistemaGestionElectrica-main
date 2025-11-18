@@ -1035,7 +1035,7 @@ def ver_boleta(request, id):
     return render(request, 'boletas/ver_boleta.html', contexto)
 
 #Ver datos para seleccionar un cliente cualquiera y luego lo manda a la pagina ver boleta de facturacion
-def generar_boleta(request):
+def generar_boleta(request, cliente_id):
     clientes = Cliente.objects.all()
     mensaje = None
     nueva_boleta = None
@@ -1079,7 +1079,10 @@ def generar_boleta(request):
     datos = {
         'clientes': clientes,
         'mensaje': mensaje,
-        'boleta': nueva_boleta
+        'boleta': nueva_boleta,
+        'medidores': Medidor.objects.all(),
+        'lecturas': Lectura.objects.all(),
+        'tarifas': Tarifa.objects.all(),
     }
 
     return render(request, 'boletas/generar_boleta.html', datos)

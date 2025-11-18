@@ -1,27 +1,63 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-  <h4 class="mb-4">Generar Boleta Automáticamente</h4>
+    <h4 class="mb-4">Generar Boleta Automáticamente</h4>
 
-  <form method="POST" action="">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="cliente" class="form-label"><strong>Seleccione un Cliente:</strong></label>
-      <select name="cliente" id="cliente" class="form-select" required>
-        <option value="">-- Seleccione un cliente --</option>
-        {% for c in clientes %}
-          <option value="{{ c.id }}">{{ c.nombre }} — {{ c.email }}</option>
-        {% endfor %}
-      </select>
-    </div>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <div class="mb-3">
 
-    <button type="submit" class="btn btn-primary mt-2">
-      Ver boleta
-    </button>
-  </form>
+            <!-- SELECT DE CLIENTE -->
+            <label for="cliente" class="form-label"><strong>Seleccione un Cliente:</strong></label>
+            <select name="cliente" id="cliente" class="form-select" required>
+                <option value="">-- Seleccione un cliente --</option>
+                {% for c in clientes %}
+                    <option value="{{ c.id }}">{{ c.nombre }} — {{ c.email }}</option>
+                {% endfor %}
+            </select>
 
-  {% if mensaje %}
-    <div class="alert alert-success mt-3">{{ mensaje }}</div>
-  {% endif %}
+            <br>
+
+            <!-- SELECT DE MEDIDOR -->
+            <label for="medidor" class="form-label"><strong>Seleccione un Medidor:</strong></label>
+            <select name="medidor" id="medidor" class="form-select">
+                <option value="">-- Seleccione un medidor --</option>
+                {% for m in medidores %}
+                    <option value="{{ m.id }}">{{ m.numero_serie }} — {{ m.ubicacion }}</option>
+                {% endfor %}
+            </select>
+
+            <br>
+
+            <!-- SELECT DE LECTURA -->
+            <label for="lectura" class="form-label"><strong>Seleccione una Lectura:</strong></label>
+            <select name="lectura" id="lectura" class="form-select">
+                <option value="">-- Seleccione una lectura --</option>
+                {% for l in lecturas %}
+                    <option value="{{ l.id }}">{{ l.lectura_actual }} kWh — {{ l.fecha }}</option>
+                {% endfor %}
+            </select>
+
+            <br>
+
+            <!-- SELECT DE TARIFA -->
+            <label for="tarifa" class="form-label"><strong>Seleccione una Tarifa:</strong></label>
+            <select name="tarifa" id="tarifa" class="form-select">
+                <option value="">-- Seleccione una tarifa --</option>
+                {% for t in tarifas %}
+                    <option value="{{ t.id }}">{{ t.tipo }} — ${{ t.precio }}</option>
+                {% endfor %}
+            </select>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-2">
+            Ver boleta
+        </button>
+    </form>
+
+    {% if mensaje %}
+        <div class="alert alert-success mt-3">{{ mensaje }}</div>
+    {% endif %}
 </div>
 {% endblock %}
